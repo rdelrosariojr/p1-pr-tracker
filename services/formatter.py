@@ -95,6 +95,46 @@
 # def format_all(prs):
 #     return "\n\n".join([format_pr(pr) for pr in prs])
 
+from datetime import datetime, timezone
+
+SUN_DEVELOPERS = {
+    "mdv-sunasterisk",
+    "jeraldechavia",
+    "jstephend-sun",
+    "jescabillas",
+    "rdelrosariojr",
+    "NiloJr-sun",
+    "reno-angelo",
+    "Francis-Tulang",
+    "hieutm-3360",
+}
+
+
+# =========================
+# TIME HELPERS
+# =========================
+def parse_time(t):
+    return datetime.strptime(t, "%Y-%m-%dT%H:%M:%SZ")
+
+
+def time_ago(iso_time):
+    now = datetime.now(timezone.utc)
+    past = parse_time(iso_time).replace(tzinfo=timezone.utc)
+    diff = now - past
+
+    days = diff.days
+    hours = diff.total_seconds() // 3600
+
+    if days > 0:
+        return f"{int(days)} day(s) ago"
+    elif hours > 0:
+        return f"{int(hours)} hr(s) ago"
+    return "just now"
+
+
+# =========================
+# HELPERS
+# =========================
 def get_latest_reviews(reviews):
     latest = {}
     for r in reviews:
@@ -108,9 +148,11 @@ def all_in_sun(users):
     return all(u in SUN_DEVELOPERS for u in users)
 
 
+# =========================
+# MAIN FORMATTER
+# =========================
 def format_pr(pr):
     message = ""
-    now = datetime.now(timezone.utc)
 
     requested_reviewers = pr.get("requested_reviewers", [])
     reviews = pr.get("reviews", [])
@@ -123,10 +165,9 @@ def format_pr(pr):
     latest_commit = max(commits, key=lambda x: parse_time(x["date"])) if commits else None
 
     # =========================
-    # NO REVIEWS CASE
+    # NO REVIEWS
     # =========================
     if not reviews:
-        # check requested reviewers
         if not requested_reviewers:
             message = "If the PR isn’t ready for review, please add an “in-progress” or “pending” label. Otherwise, kindly request a review."
         else:
@@ -138,11 +179,10 @@ def format_pr(pr):
             else:
                 message = "Please follow up on the client review request."
 
-        # check comments (override if needed)
-        if comments:
-            if all(c["author"] != author for c in comments):
-                latest_comment = max(comments, key=lambda x: parse_time(x["created_at"]))
-                message = f"New comment/s ({time_ago(latest_comment['created_at'])}), please check."
+        # comments override
+        if comments and all(c["author"] != author for c in comments):
+            latest_comment = max(comments, key=lambda x: parse_time(x["created_at"]))
+            message = f"New comment/s ({time_ago(latest_comment['created_at'])}), please check."
 
     # =========================
     # WITH REVIEWS
@@ -208,3 +248,13 @@ def format_pr(pr):
     lines.append(f"  - {message}")
 
     return "\n".join(lines)
+
+
+# =========================
+# FORMAT ALL
+# =========================
+def format_all(prs):
+    if not prs:
+        return "No open PRs."
+
+    return "\n\n".join([format_pr(pr) for pr in prs])
