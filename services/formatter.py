@@ -188,10 +188,20 @@ def format_all(prs):
         grouped[status].append(formatted)
 
     output = []
+
+    # Add tracker header
+    output.append("🔹 SUN PR Tracker - Overview")
+    output.append("This tracker summarizes the current state of open PRs, highlighting required reviews, approvals, comments, and testing labels.\n")
+
     for section in ["🔴 Needs Action", "🟡 Waiting Review", "🟢 Ready to Merge"]:
         if grouped[section]:
             output.append(section)
             output.append("\n".join(grouped[section]))
             output.append("")  # spacing
+
+    output.append("\n📌 Notes:")
+    output.append("  - React with :white_check_mark: once you have completed the required actions.")
+    output.append("  - If an action does not apply to you, feel free to disregard it.")
+    output.append("  - Ensure testing labels are added for PRs that require local testing.")
 
     return "\n".join(output).strip()
