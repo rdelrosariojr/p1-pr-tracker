@@ -123,14 +123,14 @@ def format_pr(pr):
                 if "server" in labels:
                     if not requested_reviewers or all_in_sun(reviewer_logins):
                         message = "Please endorse this for client review."
-                        status = "🟢 Ready to Merge"
+                        status = "🔴 Needs Action"
                     else:
                         message = "Please follow up on the client review request."
                         status = "🔴 Needs Action"
                 else:
                     if not requested_reviewers or all_in_sun(reviewer_logins):
                         message = "If requires client review, please request. Otherwise, please merge this PR."
-                        status = "🟢 Ready to Merge"
+                        status = "🔴 Needs Action"
                     else:
                         message = "Please follow up on the client review request."
                         status = "🔴 Needs Action"
