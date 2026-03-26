@@ -64,6 +64,7 @@ def tag_users(usernames):
 # =========================
 def format_pr(pr):
     message = ""
+    extra_message = ""
     status = "🟡 Waiting Review"
 
     requested_reviewers = pr.get("requested_reviewers", [])
@@ -154,6 +155,12 @@ def format_pr(pr):
             status = "🔴 Needs Action"
 
     # -------------------------
+    # EXTRA LABEL MESSAGE
+    # -------------------------
+    if "Can be tested directly in dev" not in labels and "Requires local testing" not in labels:
+        extra_message = 'Please add "Can be tested directly in dev" or "Requires local testing" if local testing is needed.'
+
+    # -------------------------
     # FORMAT OUTPUT
     # -------------------------
     opened_time = time_ago(pr["created_at"])
@@ -161,6 +168,8 @@ def format_pr(pr):
     lines.append(f"• <{pr['url']}|{pr['title']}>")
     lines.append(f"  Author: {author}, opened {opened_time}")
     lines.append(f"  - {message}")
+    if extra_message:
+        lines.append(f"  - {extra_message}")
 
     return status, "\n".join(lines)
 
