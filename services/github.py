@@ -6,10 +6,15 @@ load_dotenv()
 
 GITHUB_TOKEN = os.getenv("GITHUB_TOKEN")
 GITHUB_REPO = os.getenv("GITHUB_REPO")
+SLACK_TOKEN = os.getenv("SLACK_TOKEN")
 
 headers = {
     "Authorization": f"Bearer {GITHUB_TOKEN}",
     "Accept": "application/vnd.github+json",
+}
+
+slack_headers = {
+    "Authorization": f"Bearer {SLACK_TOKEN}"
 }
 
 FILTER_LABELS = {"Opened by sun-asterisk", "Created by sun-asterisk"}
@@ -105,3 +110,8 @@ def fetch_reviews(pr_url):
         for r in resp.json()
         if r.get("submitted_at") and "[bot]" not in r["user"]["login"].lower()
     ]
+
+def fetch_sun_devs():
+    print(slack_headers)
+    res = requests.get("https://slack.com/api/users.list", headers=slack_headers).json()
+    return res

@@ -12,6 +12,21 @@ SUN_DEVELOPERS = {
     "hieutm-3360",
 }
 
+SUN_DEVELOPERS_slack_ids = {
+    "mdv-sunasterisk": "U071NLP7RQB",
+    "jeraldechavia": "U02HWN106HH",
+    "jstephend-sun": "U02N5296LE4",
+    "jescabillas": "U0432724NF4",
+    "rdelrosariojr": "U02RP7G12KH",
+    "NiloJr-sun": "U03Q6RUTSU8",
+    "reno-angelo": "U08003FTP3M",
+    "Francis-Tulang": "U03N2F6G4J0",
+    "hieutm-3360": "U03NJMQHFRD",
+}
+
+
+
+
 # =========================
 # TIME HELPERS
 # =========================
@@ -203,5 +218,18 @@ def format_all(prs):
     output.append("  - React with :white_check_mark: once you have completed the required actions.")
     output.append("  - If an action does not apply to you, feel free to disregard it.")
     output.append("  - Ensure testing labels are added for PRs that require local testing.")
+
+    # -------------------------
+    # SUN DEV TAGGING (NEW)
+    # -------------------------
+    sun_mentions = " ".join(
+        f"<@{SUN_DEVELOPERS_slack_ids[user]}>"
+        for user in SUN_DEVELOPERS
+        if user in SUN_DEVELOPERS_slack_ids
+    )
+
+    if sun_mentions:
+        output.append(f"\n cc:")
+        output.append(sun_mentions)
 
     return "\n".join(output).strip()
