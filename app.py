@@ -4,6 +4,7 @@ from services.github import fetch_prs, fetch_sun_devs
 from services.formatter import format_all
 from services.slack import send_message
 import logging
+import requests 
 
 app = Flask(__name__)
 
