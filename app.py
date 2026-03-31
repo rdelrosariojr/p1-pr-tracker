@@ -3,6 +3,7 @@ from threading import Thread
 from services.github import fetch_prs, fetch_sun_devs
 from services.formatter import format_all
 from services.slack import send_message
+import logging
 
 app = Flask(__name__)
 
@@ -41,13 +42,19 @@ def slack_devs():
 
 @app.route("/slack/command", methods=["POST"])
 def slack_command():
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger(__name__)
     data = request.form
     response_url = data.get("response_url")
-
+    command = request.form.get("command")
+    
     def process():
         try:
             prs = fetch_prs()
             message = format_all(prs)
+            logger.info("Received Slack command: %s", command)
+            logger.info("Fetching PRs started")
+            logger.info("PRs fetched: %d", len(prs))
 
             requests.post(response_url, json={
                 "response_type": "in_channel",
