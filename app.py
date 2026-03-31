@@ -1,4 +1,5 @@
 from flask import Flask, request, jsonify
+from threading import Thread
 from services.github import fetch_prs, fetch_sun_devs
 from services.formatter import format_all
 from services.slack import send_message
@@ -40,22 +41,27 @@ def slack_devs():
 
 @app.route("/slack/command", methods=["POST"])
 def slack_command():
-    try:
-        command = request.form.get("command")
+    data = request.form
+    response_url = data.get("response_url")
 
-        if command == "/pro-one-pr-tracker":
+    def process():
+        try:
             prs = fetch_prs()
             message = format_all(prs)
 
-            return {
-                "response_type": "in_channel",  # visible to everyone
+            requests.post(response_url, json={
+                "response_type": "in_channel",
                 "text": message
-            }
+            })
+        except Exception as e:
+            requests.post(response_url, json={
+                "text": f"Error: {str(e)}"
+            })
 
-        return {"text": "Unknown command"}, 400
+    Thread(target=process).start()
 
-    except Exception as e:
-        return {"text": f"Error: {str(e)}"}, 500
+    # MUST return within 3 seconds
+    return {"text": "Fetching PRs... please wait ⏳"}
 
 if __name__ == "__main__":
     app.run(debug=True)
