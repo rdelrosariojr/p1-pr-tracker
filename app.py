@@ -1,4 +1,4 @@
-from flask import Flask, jsonify
+from flask import Flask, request, jsonify
 from services.github import fetch_prs, fetch_sun_devs
 from services.formatter import format_all
 from services.slack import send_message
@@ -38,6 +38,24 @@ def slack_devs():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route("/slack/command", methods=["POST"])
+def slack_command():
+    try:
+        command = request.form.get("command")
+
+        if command == "/pro-one-pr-tracker":
+            prs = fetch_prs()
+            message = format_all(prs)
+
+            return {
+                "response_type": "in_channel",  # visible to everyone
+                "text": message
+            }
+
+        return {"text": "Unknown command"}, 400
+
+    except Exception as e:
+        return {"text": f"Error: {str(e)}"}, 500
 
 if __name__ == "__main__":
     app.run(debug=True)
