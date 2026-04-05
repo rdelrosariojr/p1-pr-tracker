@@ -25,8 +25,12 @@ def get_prs():
 
 @app.route("/send-to-slack")
 def send_to_slack():
+    logging.basicConfig(level=logging.INFO)
+    logger = logging.getLogger(__name__)
     try:
         prs = fetch_prs()
+        logger.info("Fetching PRs started")
+        logger.info("PRs fetched: %d", len(prs))
         message = format_all(prs)
         send_message(message)
         return {"status": "sent"}

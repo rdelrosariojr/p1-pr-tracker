@@ -1,0 +1,15 @@
+name: PR Tracker Cron
+
+on:
+  schedule:
+    - cron: "15 16 * * *"
+  workflow_dispatch: # allows manual run
+
+jobs:
+  run-cron:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Call PR Tracker API
+        run: |
+          curl --max-time 30 -X POST https://p1-pr-tracker.onrender.com/send-to-slack || echo "Request failed"
