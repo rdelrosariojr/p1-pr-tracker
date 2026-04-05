@@ -12,4 +12,4 @@ jobs:
     steps:
       - name: Call PR Tracker API
         run: |
-          curl --max-time 30 -X POST https://p1-pr-tracker.onrender.com/send-to-slack || echo "Request failed"
+          curl --max-time 30 -X GET https://p1-pr-tracker.onrender.com/send-to-slack || echo "Request failed"
