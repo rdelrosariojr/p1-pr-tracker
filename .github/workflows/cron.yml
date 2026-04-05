@@ -2,7 +2,7 @@ name: PR Tracker Cron
 
 on:
   schedule:
-    - cron: "15 16 * * *"
+    - cron: "25 15 * * *"
   workflow_dispatch: # allows manual run
 
 jobs:
